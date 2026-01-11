@@ -12,7 +12,7 @@ type Job struct {
 	Queue       string `gorm:"column:queue;not null" json:"queue"`
 	Payload     string `gorm:"column:payload;not null" json:"payload"`
 	Attempts    int16  `gorm:"column:attempts;not null" json:"attempts"`
-	ReservedAt  int32  `gorm:"column:reserved_at" json:"reserved_at"`
+	ReservedAt  *int32 `gorm:"column:reserved_at" json:"reserved_at"`
 	AvailableAt int32  `gorm:"column:available_at;not null" json:"available_at"`
 	CreatedAt   int32  `gorm:"column:created_at;not null" json:"created_at"`
 }

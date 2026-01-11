@@ -12,14 +12,14 @@ const TableNameWbCatalogNotification = "wb_catalog_notifications"
 
 // WbCatalogNotification mapped from table <wb_catalog_notifications>
 type WbCatalogNotification struct {
-	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	Name      string    `gorm:"column:name;not null" json:"name"`
-	URL       string    `gorm:"column:url;not null" json:"url"`
-	Status    string    `gorm:"column:status;not null;default:ready" json:"status"`
-	Interval  int32     `gorm:"column:interval;not null" json:"interval"`
-	UserID    int64     `gorm:"column:user_id;not null" json:"user_id"`
-	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
+	ID        int64      `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	Name      string     `gorm:"column:name;not null" json:"name"`
+	URL       string     `gorm:"column:url;not null" json:"url"`
+	Status    string     `gorm:"column:status;not null;default:ready" json:"status"`
+	Interval  int32      `gorm:"column:interval;not null" json:"interval"`
+	UserID    int64      `gorm:"column:user_id;not null" json:"user_id"`
+	CreatedAt *time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt *time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
 
 // TableName WbCatalogNotification's table name

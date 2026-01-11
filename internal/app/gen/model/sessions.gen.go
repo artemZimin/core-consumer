@@ -8,12 +8,12 @@ const TableNameSession = "sessions"
 
 // Session mapped from table <sessions>
 type Session struct {
-	ID           string `gorm:"column:id;primaryKey" json:"id"`
-	UserID       int64  `gorm:"column:user_id" json:"user_id"`
-	IPAddress    string `gorm:"column:ip_address" json:"ip_address"`
-	UserAgent    string `gorm:"column:user_agent" json:"user_agent"`
-	Payload      string `gorm:"column:payload;not null" json:"payload"`
-	LastActivity int32  `gorm:"column:last_activity;not null" json:"last_activity"`
+	ID           string  `gorm:"column:id;primaryKey" json:"id"`
+	UserID       *int64  `gorm:"column:user_id" json:"user_id"`
+	IPAddress    *string `gorm:"column:ip_address" json:"ip_address"`
+	UserAgent    *string `gorm:"column:user_agent" json:"user_agent"`
+	Payload      string  `gorm:"column:payload;not null" json:"payload"`
+	LastActivity int32   `gorm:"column:last_activity;not null" json:"last_activity"`
 }
 
 // TableName Session's table name

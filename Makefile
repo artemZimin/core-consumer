@@ -8,7 +8,9 @@ fmt:
 	go fmt ./...
 
 generate-db-models:
-	go tool github.com/xo/xo schema -o=internal/generated/models -k=field -e=created_at "$(DB_STRING)"
+	go tool gorm.io/gen/tools/gentool -db postgres -dsn "host=localhost port=5432 user=sail password=password dbname=laravel sslmode=disable" -outPath "internal/app/gen/query" -fieldNullable true
+
+
 
 generate-di-container:
 	go tool github.com/google/wire/cmd/wire ./internal/generated/container

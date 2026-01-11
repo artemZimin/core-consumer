@@ -14,7 +14,7 @@ type Producer struct {
 	queueName string
 }
 
-func NewProducer(rmq *RabbitMQ, cfg config.Config) (*Producer, error) {
+func NewProducer(rmq *RabbitMQ, cfg *config.Config) (*Producer, error) {
 	ch := rmq.GetChannel()
 
 	_, err := ch.QueueDeclare(

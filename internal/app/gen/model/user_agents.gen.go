@@ -12,11 +12,11 @@ const TableNameUserAgent = "user_agents"
 
 // UserAgent mapped from table <user_agents>
 type UserAgent struct {
-	ID        int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	Data      string    `gorm:"column:data;not null" json:"data"`
-	UserID    int64     `gorm:"column:user_id;not null" json:"user_id"`
-	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`
+	ID        int64      `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	Data      string     `gorm:"column:data;not null" json:"data"`
+	UserID    int64      `gorm:"column:user_id;not null" json:"user_id"`
+	CreatedAt *time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt *time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
 
 // TableName UserAgent's table name

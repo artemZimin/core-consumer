@@ -12,12 +12,12 @@ const TableNameWbCatalogNotificationLog = "wb_catalog_notification_logs"
 
 // WbCatalogNotificationLog mapped from table <wb_catalog_notification_logs>
 type WbCatalogNotificationLog struct {
-	ID                      int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	UserAgentID             int64     `gorm:"column:user_agent_id;not null" json:"user_agent_id"`
-	ProxyID                 int64     `gorm:"column:proxy_id;not null" json:"proxy_id"`
-	WbCatalogNotificationID int64     `gorm:"column:wb_catalog_notification_id;not null" json:"wb_catalog_notification_id"`
-	CreatedAt               time.Time `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt               time.Time `gorm:"column:updated_at" json:"updated_at"`
+	ID                      int64      `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	UserAgentID             int64      `gorm:"column:user_agent_id;not null" json:"user_agent_id"`
+	ProxyID                 int64      `gorm:"column:proxy_id;not null" json:"proxy_id"`
+	WbCatalogNotificationID int64      `gorm:"column:wb_catalog_notification_id;not null" json:"wb_catalog_notification_id"`
+	CreatedAt               *time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt               *time.Time `gorm:"column:updated_at" json:"updated_at"`
 }
 
 // TableName WbCatalogNotificationLog's table name
