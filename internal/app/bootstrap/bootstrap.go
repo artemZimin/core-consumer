@@ -9,6 +9,8 @@ import (
 	"core-consumer/internal/app/infra/queue/rabbitmq"
 	browserstorage "core-consumer/internal/app/storage/browser_storage"
 	catalognotification "core-consumer/internal/catalog_notification"
+	"core-consumer/internal/stealth"
+	telegrambot "core-consumer/internal/telegram_bot"
 )
 
 func Bootstrap() {
@@ -40,12 +42,24 @@ func Bootstrap() {
 
 	browserStorage := browserstorage.New()
 
+	stealthModule := stealth.Init(db, q)
+	telegramBotModule, err := telegrambot.Init(
+		cfg,
+		q,
+	)
+	if err != nil {
+		panic(err)
+	}
+
 	catalognotification.Init(
 		rabbitConsumer,
 		loggerService,
 		q,
+		db,
 		rabbitProducer,
 		browserStorage,
+		stealthModule,
+		telegramBotModule,
 	)
 
 	rabbitConsumer.Start(context.TODO())

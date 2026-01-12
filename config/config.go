@@ -10,6 +10,7 @@ type Config struct {
 	RabbitMQPort                int    `env:"RABBIMQ_PORT" env-default:""`
 	RabbitMQQueueName           string `env:"RABBIMQ_QUEUE_NAME" env-default:""`
 	RabbitMQConsumeWorkersCount int    `env:"RABBIMQ_CONSUME_WORKERS_COUNT" env-default:""`
+	TelegramBotToken            string `env:"TELEGRAM_BOT_TOKEN" env-default:""`
 }
 
 func Load() (*Config, error) {

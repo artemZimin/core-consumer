@@ -9,14 +9,22 @@ import (
 	wbcatalognotificationprocess "core-consumer/internal/catalog_notification/job/wb_catalog_notification_process"
 	wbcatalognotificationstart "core-consumer/internal/catalog_notification/job/wb_catalog_notification_start"
 	wbcatalognotification "core-consumer/internal/catalog_notification/repositories/wb_catalog_notification"
+	wbproduct "core-consumer/internal/catalog_notification/repositories/wb_product"
+	"core-consumer/internal/stealth"
+	telegrambot "core-consumer/internal/telegram_bot"
+
+	"gorm.io/gorm"
 )
 
 func Init(
 	rabbitConumer *rabbitmq.Consumer,
 	loggerService *logger.Logger,
 	q *query.Query,
+	db *gorm.DB,
 	producer *rabbitmq.Producer,
 	browserStorage *browserstorage.Storage,
+	stealthModule *stealth.Module,
+	telgramBotModule *telegrambot.Module,
 ) error {
 	wbCatalogNotificationRepo := wbcatalognotification.New(q)
 	rabbitConumer.RegisterHandler(
@@ -28,6 +36,8 @@ func Init(
 		).Handle,
 	)
 
+	productsRepo := wbproduct.New(db, q)
+
 	rabbitConumer.RegisterHandler(
 		constants.JobWbCatalogNotificationProccess,
 		wbcatalognotificationprocess.New(
@@ -35,6 +45,10 @@ func Init(
 			wbCatalogNotificationRepo,
 			producer,
 			browserStorage,
+			stealthModule.ProxyRepo,
+			stealthModule.UserAgentRepo,
+			productsRepo,
+			telgramBotModule.TgBot,
 		).Handle,
 	)
 

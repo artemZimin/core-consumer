@@ -32,6 +32,7 @@ func newWbCatalogNotification(db *gorm.DB, opts ...gen.DOOption) wbCatalogNotifi
 	_wbCatalogNotification.URL = field.NewString(tableName, "url")
 	_wbCatalogNotification.Status = field.NewString(tableName, "status")
 	_wbCatalogNotification.Interval = field.NewInt32(tableName, "interval")
+	_wbCatalogNotification.MaxPrice = field.NewInt32(tableName, "max_price")
 	_wbCatalogNotification.UserID = field.NewInt64(tableName, "user_id")
 	_wbCatalogNotification.CreatedAt = field.NewTime(tableName, "created_at")
 	_wbCatalogNotification.UpdatedAt = field.NewTime(tableName, "updated_at")
@@ -50,6 +51,7 @@ type wbCatalogNotification struct {
 	URL       field.String
 	Status    field.String
 	Interval  field.Int32
+	MaxPrice  field.Int32
 	UserID    field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
@@ -74,6 +76,7 @@ func (w *wbCatalogNotification) updateTableName(table string) *wbCatalogNotifica
 	w.URL = field.NewString(table, "url")
 	w.Status = field.NewString(table, "status")
 	w.Interval = field.NewInt32(table, "interval")
+	w.MaxPrice = field.NewInt32(table, "max_price")
 	w.UserID = field.NewInt64(table, "user_id")
 	w.CreatedAt = field.NewTime(table, "created_at")
 	w.UpdatedAt = field.NewTime(table, "updated_at")
@@ -105,12 +108,13 @@ func (w *wbCatalogNotification) GetFieldByName(fieldName string) (field.OrderExp
 }
 
 func (w *wbCatalogNotification) fillFieldMap() {
-	w.fieldMap = make(map[string]field.Expr, 8)
+	w.fieldMap = make(map[string]field.Expr, 9)
 	w.fieldMap["id"] = w.ID
 	w.fieldMap["name"] = w.Name
 	w.fieldMap["url"] = w.URL
 	w.fieldMap["status"] = w.Status
 	w.fieldMap["interval"] = w.Interval
+	w.fieldMap["max_price"] = w.MaxPrice
 	w.fieldMap["user_id"] = w.UserID
 	w.fieldMap["created_at"] = w.CreatedAt
 	w.fieldMap["updated_at"] = w.UpdatedAt

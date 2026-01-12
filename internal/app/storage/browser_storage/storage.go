@@ -38,7 +38,7 @@ func (s *Storage) GetOrCreate(id int64, proxyStr string) (*rod.Browser, error) {
 	proxy := parts[0]
 	user := authParts[0]
 	password := authParts[1]
-	l := launcher.New().Headless(false)
+	l := launcher.New().Headless(true)
 	l = l.Set(flags.ProxyServer, proxy)
 
 	controlURL, _ := l.Launch()

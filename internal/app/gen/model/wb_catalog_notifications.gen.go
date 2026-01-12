@@ -17,6 +17,7 @@ type WbCatalogNotification struct {
 	URL       string     `gorm:"column:url;not null" json:"url"`
 	Status    string     `gorm:"column:status;not null;default:ready" json:"status"`
 	Interval  int32      `gorm:"column:interval;not null" json:"interval"`
+	MaxPrice  int32      `gorm:"column:max_price;not null" json:"max_price"`
 	UserID    int64      `gorm:"column:user_id;not null" json:"user_id"`
 	CreatedAt *time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt *time.Time `gorm:"column:updated_at" json:"updated_at"`

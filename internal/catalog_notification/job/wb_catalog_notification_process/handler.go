@@ -2,15 +2,23 @@ package wbcatalognotificationprocess
 
 import (
 	"context"
+	"core-consumer/internal/app/gen/model"
 	"core-consumer/internal/app/infra/logger"
 	"core-consumer/internal/app/infra/queue/rabbitmq"
 	browserstorage "core-consumer/internal/app/storage/browser_storage"
 	"core-consumer/internal/catalog_notification/constants"
 	wbcatalognotification "core-consumer/internal/catalog_notification/parser/wb_catalog_notification"
 	wbcatalognotificationRepo "core-consumer/internal/catalog_notification/repositories/wb_catalog_notification"
+	wbproduct "core-consumer/internal/catalog_notification/repositories/wb_product"
+	"core-consumer/internal/stealth/repository/proxy"
+	useragent "core-consumer/internal/stealth/repository/user_agent"
+	"core-consumer/internal/telegram_bot/manager/bot"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Handler struct {
@@ -18,6 +26,10 @@ type Handler struct {
 	wbCatalogNotificationRepo *wbcatalognotificationRepo.Repository
 	producer                  *rabbitmq.Producer
 	browserStorage            *browserstorage.Storage
+	proxyRepo                 *proxy.Repository
+	userAgentRepo             *useragent.Repository
+	productsRepo              *wbproduct.Repository
+	tgBot                     *bot.Manager
 }
 
 func New(
@@ -25,12 +37,20 @@ func New(
 	wbCatalogNotificationRepo *wbcatalognotificationRepo.Repository,
 	producer *rabbitmq.Producer,
 	browserStorage *browserstorage.Storage,
+	proxyRepo *proxy.Repository,
+	userAgentRepo *useragent.Repository,
+	productsRepo *wbproduct.Repository,
+	tgBot *bot.Manager,
 ) *Handler {
 	return &Handler{
 		loggerService:             loggerService,
 		wbCatalogNotificationRepo: wbCatalogNotificationRepo,
 		producer:                  producer,
 		browserStorage:            browserStorage,
+		proxyRepo:                 proxyRepo,
+		userAgentRepo:             userAgentRepo,
+		productsRepo:              productsRepo,
+		tgBot:                     tgBot,
 	}
 }
 
@@ -54,6 +74,7 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 				"cannot remove browser",
 				slog.Float64("id", id),
 				slog.String("error", err.Error()),
+				slog.String("status", notification.Status),
 			)
 		}
 
@@ -62,21 +83,70 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 
 	h.loggerService.Info("slep", slog.Any("sec", notification.Interval))
 
+	proxy, err := h.proxyRepo.FindByWbCatalogNotification(notification.ID)
+	if err != nil {
+		h.loggerService.Error("proxy not found", slog.String("error", err.Error()))
+	}
+
+	userAgent, err := h.userAgentRepo.FindRandom()
+	if err != nil {
+		h.loggerService.Error("user agent not found", slog.String("error", err.Error()))
+	}
+
 	parser := wbcatalognotification.New(h.browserStorage)
 	products, err := parser.Parse(
 		wbcatalognotification.ParseParams{
 			NotificationID: notification.ID,
-			URL:            "https://www.wildberries.ru/catalog/0/search.aspx?page=1&sort=priceup&search=playstation+5+%D1%81+%D0%B4%D0%B8%D1%81%D0%BA%D0%BE%D0%B2%D0%BE%D0%B4%D0%BE%D0%BC&priceU=3000000%3B250125000&targeturl=ST",
-			Proxy:          "93.157.251.104:25029@600523794:804967867",
-			UserAgent:      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-			MaxPrice:       50000,
+			URL:            notification.URL,
+			Proxy:          proxy.Data,
+			UserAgent:      userAgent.Data,
+			MaxPrice:       int64(notification.MaxPrice),
 		},
 	)
 	if err != nil {
 		return err
 	}
 
-	h.loggerService.Info("success", slog.Any("result", fmt.Sprintf("%v", products)))
+	for _, product := range products {
+		_, err := h.productsRepo.FindByUrlAndPriceInCatalogNotification(
+			wbproduct.FindByUrlAndPriceInCatalogNotificationParams{
+				NotificationID: notification.ID,
+				URL:            product.URL,
+				Price:          int32(product.Price),
+			},
+		)
+		if err == nil {
+			continue
+		}
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+
+		h.loggerService.Info("product", slog.Any("result", fmt.Sprintf("%v", product)))
+		err = h.productsRepo.Create(&model.WbCatalogNotificationProduct{
+			Price:                   int32(product.Price),
+			URL:                     product.URL,
+			Img:                     product.Img,
+			WbCatalogNotificationID: notification.ID,
+		})
+		if err != nil {
+			return err
+		}
+
+		if err := h.tgBot.BroadcastWbCatalogNotification(
+			bot.BroadcastWbCatalogNotificationParam{
+				ImgURL:           product.Img,
+				NotificationName: notification.Name,
+				ProductURL:       product.URL,
+				Price:            product.Price,
+			},
+		); err != nil {
+			h.loggerService.Error(
+				"Failed broadcast wb notification",
+				slog.Int64("wb_catalog_notification_id", notification.ID),
+			)
+		}
+	}
 
 	time.Sleep(time.Duration(notification.Interval) * time.Second)
 

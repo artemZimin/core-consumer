@@ -17,62 +17,68 @@ import (
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:                         db,
-		Cache:                      newCache(db, opts...),
-		CacheLock:                  newCacheLock(db, opts...),
-		FailedJob:                  newFailedJob(db, opts...),
-		Job:                        newJob(db, opts...),
-		JobBatch:                   newJobBatch(db, opts...),
-		Migration:                  newMigration(db, opts...),
-		PasswordResetToken:         newPasswordResetToken(db, opts...),
-		Proxy:                      newProxy(db, opts...),
-		Session:                    newSession(db, opts...),
-		User:                       newUser(db, opts...),
-		UserAgent:                  newUserAgent(db, opts...),
-		WbCatalogNotification:      newWbCatalogNotification(db, opts...),
-		WbCatalogNotificationLog:   newWbCatalogNotificationLog(db, opts...),
-		WbCatalogNotificationProxy: newWbCatalogNotificationProxy(db, opts...),
+		db:                           db,
+		Cache:                        newCache(db, opts...),
+		CacheLock:                    newCacheLock(db, opts...),
+		FailedJob:                    newFailedJob(db, opts...),
+		Job:                          newJob(db, opts...),
+		JobBatch:                     newJobBatch(db, opts...),
+		Migration:                    newMigration(db, opts...),
+		PasswordResetToken:           newPasswordResetToken(db, opts...),
+		Proxy:                        newProxy(db, opts...),
+		Session:                      newSession(db, opts...),
+		TelegramBotUser:              newTelegramBotUser(db, opts...),
+		User:                         newUser(db, opts...),
+		UserAgent:                    newUserAgent(db, opts...),
+		WbCatalogNotification:        newWbCatalogNotification(db, opts...),
+		WbCatalogNotificationLog:     newWbCatalogNotificationLog(db, opts...),
+		WbCatalogNotificationProduct: newWbCatalogNotificationProduct(db, opts...),
+		WbCatalogNotificationProxy:   newWbCatalogNotificationProxy(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Cache                      cache
-	CacheLock                  cacheLock
-	FailedJob                  failedJob
-	Job                        job
-	JobBatch                   jobBatch
-	Migration                  migration
-	PasswordResetToken         passwordResetToken
-	Proxy                      proxy
-	Session                    session
-	User                       user
-	UserAgent                  userAgent
-	WbCatalogNotification      wbCatalogNotification
-	WbCatalogNotificationLog   wbCatalogNotificationLog
-	WbCatalogNotificationProxy wbCatalogNotificationProxy
+	Cache                        cache
+	CacheLock                    cacheLock
+	FailedJob                    failedJob
+	Job                          job
+	JobBatch                     jobBatch
+	Migration                    migration
+	PasswordResetToken           passwordResetToken
+	Proxy                        proxy
+	Session                      session
+	TelegramBotUser              telegramBotUser
+	User                         user
+	UserAgent                    userAgent
+	WbCatalogNotification        wbCatalogNotification
+	WbCatalogNotificationLog     wbCatalogNotificationLog
+	WbCatalogNotificationProduct wbCatalogNotificationProduct
+	WbCatalogNotificationProxy   wbCatalogNotificationProxy
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:                         db,
-		Cache:                      q.Cache.clone(db),
-		CacheLock:                  q.CacheLock.clone(db),
-		FailedJob:                  q.FailedJob.clone(db),
-		Job:                        q.Job.clone(db),
-		JobBatch:                   q.JobBatch.clone(db),
-		Migration:                  q.Migration.clone(db),
-		PasswordResetToken:         q.PasswordResetToken.clone(db),
-		Proxy:                      q.Proxy.clone(db),
-		Session:                    q.Session.clone(db),
-		User:                       q.User.clone(db),
-		UserAgent:                  q.UserAgent.clone(db),
-		WbCatalogNotification:      q.WbCatalogNotification.clone(db),
-		WbCatalogNotificationLog:   q.WbCatalogNotificationLog.clone(db),
-		WbCatalogNotificationProxy: q.WbCatalogNotificationProxy.clone(db),
+		db:                           db,
+		Cache:                        q.Cache.clone(db),
+		CacheLock:                    q.CacheLock.clone(db),
+		FailedJob:                    q.FailedJob.clone(db),
+		Job:                          q.Job.clone(db),
+		JobBatch:                     q.JobBatch.clone(db),
+		Migration:                    q.Migration.clone(db),
+		PasswordResetToken:           q.PasswordResetToken.clone(db),
+		Proxy:                        q.Proxy.clone(db),
+		Session:                      q.Session.clone(db),
+		TelegramBotUser:              q.TelegramBotUser.clone(db),
+		User:                         q.User.clone(db),
+		UserAgent:                    q.UserAgent.clone(db),
+		WbCatalogNotification:        q.WbCatalogNotification.clone(db),
+		WbCatalogNotificationLog:     q.WbCatalogNotificationLog.clone(db),
+		WbCatalogNotificationProduct: q.WbCatalogNotificationProduct.clone(db),
+		WbCatalogNotificationProxy:   q.WbCatalogNotificationProxy.clone(db),
 	}
 }
 
@@ -86,57 +92,63 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:                         db,
-		Cache:                      q.Cache.replaceDB(db),
-		CacheLock:                  q.CacheLock.replaceDB(db),
-		FailedJob:                  q.FailedJob.replaceDB(db),
-		Job:                        q.Job.replaceDB(db),
-		JobBatch:                   q.JobBatch.replaceDB(db),
-		Migration:                  q.Migration.replaceDB(db),
-		PasswordResetToken:         q.PasswordResetToken.replaceDB(db),
-		Proxy:                      q.Proxy.replaceDB(db),
-		Session:                    q.Session.replaceDB(db),
-		User:                       q.User.replaceDB(db),
-		UserAgent:                  q.UserAgent.replaceDB(db),
-		WbCatalogNotification:      q.WbCatalogNotification.replaceDB(db),
-		WbCatalogNotificationLog:   q.WbCatalogNotificationLog.replaceDB(db),
-		WbCatalogNotificationProxy: q.WbCatalogNotificationProxy.replaceDB(db),
+		db:                           db,
+		Cache:                        q.Cache.replaceDB(db),
+		CacheLock:                    q.CacheLock.replaceDB(db),
+		FailedJob:                    q.FailedJob.replaceDB(db),
+		Job:                          q.Job.replaceDB(db),
+		JobBatch:                     q.JobBatch.replaceDB(db),
+		Migration:                    q.Migration.replaceDB(db),
+		PasswordResetToken:           q.PasswordResetToken.replaceDB(db),
+		Proxy:                        q.Proxy.replaceDB(db),
+		Session:                      q.Session.replaceDB(db),
+		TelegramBotUser:              q.TelegramBotUser.replaceDB(db),
+		User:                         q.User.replaceDB(db),
+		UserAgent:                    q.UserAgent.replaceDB(db),
+		WbCatalogNotification:        q.WbCatalogNotification.replaceDB(db),
+		WbCatalogNotificationLog:     q.WbCatalogNotificationLog.replaceDB(db),
+		WbCatalogNotificationProduct: q.WbCatalogNotificationProduct.replaceDB(db),
+		WbCatalogNotificationProxy:   q.WbCatalogNotificationProxy.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Cache                      *cacheDo
-	CacheLock                  *cacheLockDo
-	FailedJob                  *failedJobDo
-	Job                        *jobDo
-	JobBatch                   *jobBatchDo
-	Migration                  *migrationDo
-	PasswordResetToken         *passwordResetTokenDo
-	Proxy                      *proxyDo
-	Session                    *sessionDo
-	User                       *userDo
-	UserAgent                  *userAgentDo
-	WbCatalogNotification      *wbCatalogNotificationDo
-	WbCatalogNotificationLog   *wbCatalogNotificationLogDo
-	WbCatalogNotificationProxy *wbCatalogNotificationProxyDo
+	Cache                        *cacheDo
+	CacheLock                    *cacheLockDo
+	FailedJob                    *failedJobDo
+	Job                          *jobDo
+	JobBatch                     *jobBatchDo
+	Migration                    *migrationDo
+	PasswordResetToken           *passwordResetTokenDo
+	Proxy                        *proxyDo
+	Session                      *sessionDo
+	TelegramBotUser              *telegramBotUserDo
+	User                         *userDo
+	UserAgent                    *userAgentDo
+	WbCatalogNotification        *wbCatalogNotificationDo
+	WbCatalogNotificationLog     *wbCatalogNotificationLogDo
+	WbCatalogNotificationProduct *wbCatalogNotificationProductDo
+	WbCatalogNotificationProxy   *wbCatalogNotificationProxyDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Cache:                      q.Cache.WithContext(ctx),
-		CacheLock:                  q.CacheLock.WithContext(ctx),
-		FailedJob:                  q.FailedJob.WithContext(ctx),
-		Job:                        q.Job.WithContext(ctx),
-		JobBatch:                   q.JobBatch.WithContext(ctx),
-		Migration:                  q.Migration.WithContext(ctx),
-		PasswordResetToken:         q.PasswordResetToken.WithContext(ctx),
-		Proxy:                      q.Proxy.WithContext(ctx),
-		Session:                    q.Session.WithContext(ctx),
-		User:                       q.User.WithContext(ctx),
-		UserAgent:                  q.UserAgent.WithContext(ctx),
-		WbCatalogNotification:      q.WbCatalogNotification.WithContext(ctx),
-		WbCatalogNotificationLog:   q.WbCatalogNotificationLog.WithContext(ctx),
-		WbCatalogNotificationProxy: q.WbCatalogNotificationProxy.WithContext(ctx),
+		Cache:                        q.Cache.WithContext(ctx),
+		CacheLock:                    q.CacheLock.WithContext(ctx),
+		FailedJob:                    q.FailedJob.WithContext(ctx),
+		Job:                          q.Job.WithContext(ctx),
+		JobBatch:                     q.JobBatch.WithContext(ctx),
+		Migration:                    q.Migration.WithContext(ctx),
+		PasswordResetToken:           q.PasswordResetToken.WithContext(ctx),
+		Proxy:                        q.Proxy.WithContext(ctx),
+		Session:                      q.Session.WithContext(ctx),
+		TelegramBotUser:              q.TelegramBotUser.WithContext(ctx),
+		User:                         q.User.WithContext(ctx),
+		UserAgent:                    q.UserAgent.WithContext(ctx),
+		WbCatalogNotification:        q.WbCatalogNotification.WithContext(ctx),
+		WbCatalogNotificationLog:     q.WbCatalogNotificationLog.WithContext(ctx),
+		WbCatalogNotificationProduct: q.WbCatalogNotificationProduct.WithContext(ctx),
+		WbCatalogNotificationProxy:   q.WbCatalogNotificationProxy.WithContext(ctx),
 	}
 }
 
