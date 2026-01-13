@@ -38,7 +38,7 @@ func NewConsumer(rmq *RabbitMQ, cfg *config.Config) (*Consumer, error) {
 		return nil, fmt.Errorf("failed to declare queue: %w", err)
 	}
 
-	err = ch.Qos(1, 0, false)
+	err = ch.Qos(cfg.RabbitMQConsumeWorkersCount*2, 0, false)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set QoS: %w", err)
 	}
@@ -103,20 +103,18 @@ func (c *Consumer) worker(ctx context.Context, msgs <-chan amqp.Delivery, worker
 				return
 			}
 
-			go func(msg amqp.Delivery) {
-				err := c.handleMessage(ctx, msg)
-				if err != nil {
-					c.loggerService.Error(
-						fmt.Sprintf("Worker %d: error processing message: %v", workerID, err),
-					)
-					_ = msg.Nack(false, false)
-				} else {
-					c.loggerService.Debug(
-						fmt.Sprintf("Worker %d: message processed successfully", workerID),
-					)
-					_ = msg.Ack(false)
-				}
-			}(msg)
+			err := c.handleMessage(ctx, msg)
+			if err != nil {
+				c.loggerService.Error(
+					fmt.Sprintf("Worker %d: error processing message: %v", workerID, err),
+				)
+				_ = msg.Nack(false, false)
+			} else {
+				c.loggerService.Debug(
+					fmt.Sprintf("Worker %d: message processed successfully", workerID),
+				)
+				_ = msg.Ack(false)
+			}
 		}
 	}
 }
