@@ -103,18 +103,20 @@ func (c *Consumer) worker(ctx context.Context, msgs <-chan amqp.Delivery, worker
 				return
 			}
 
-			err := c.handleMessage(ctx, msg)
-			if err != nil {
-				c.loggerService.Error(
-					fmt.Sprintf("Worker %d: error processing message: %v", workerID, err),
-				)
-				_ = msg.Nack(false, false)
-			} else {
-				c.loggerService.Debug(
-					fmt.Sprintf("Worker %d: message processed successfully", workerID),
-				)
-				_ = msg.Ack(false)
-			}
+			go func(msg amqp.Delivery) {
+				err := c.handleMessage(ctx, msg)
+				if err != nil {
+					c.loggerService.Error(
+						fmt.Sprintf("Worker %d: error processing message: %v", workerID, err),
+					)
+					_ = msg.Nack(false, false)
+				} else {
+					c.loggerService.Debug(
+						fmt.Sprintf("Worker %d: message processed successfully", workerID),
+					)
+					_ = msg.Ack(false)
+				}
+			}(msg)
 		}
 	}
 }
