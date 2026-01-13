@@ -30,12 +30,19 @@ func (s *Service) Parse(params ParseParams) ([]Product, error) {
 		return nil, err
 	}
 
-	page := stealth.MustPage(browser)
+	page, err := stealth.Page(browser)
+	if err != nil {
+		return nil, err
+	}
 	defer page.Close()
+
 	page.SetUserAgent(&proto.NetworkSetUserAgentOverride{
 		UserAgent: params.UserAgent,
 	})
-	page.MustNavigate(params.URL)
+	err = page.Navigate(params.URL)
+	if err != nil {
+		return nil, err
+	}
 
 	_, err = page.Timeout(60 * time.Second).Element(".product-card")
 	if err != nil {
