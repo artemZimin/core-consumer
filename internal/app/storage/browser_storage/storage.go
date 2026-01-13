@@ -38,10 +38,13 @@ func (s *Storage) GetOrCreate(id int64, proxyStr string) (*rod.Browser, error) {
 	proxy := parts[0]
 	user := authParts[0]
 	password := authParts[1]
-	l := launcher.New().Headless(true)
+	l := launcher.New().Bin("/usr/bin/google-chrome").Headless(true).NoSandbox(true)
 	l = l.Set(flags.ProxyServer, proxy)
 
-	controlURL, _ := l.Launch()
+	controlURL, err := l.Launch()
+	if err != nil {
+		return nil, err
+	}
 	browser := rod.New().ControlURL(controlURL).MustConnect()
 
 	go browser.MustHandleAuth(user, password)()

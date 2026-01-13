@@ -104,7 +104,16 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		},
 	)
 	if err != nil {
-		return err
+		h.loggerService.Error("parse error", slog.String("error", err.Error()))
+
+		h.producer.PublishJob(ctx, &rabbitmq.Job{
+			Job: constants.JobWbCatalogNotificationProccess,
+			Data: map[string]any{
+				"id": notification.ID,
+			},
+		})
+
+		return nil
 	}
 
 	for _, product := range products {
