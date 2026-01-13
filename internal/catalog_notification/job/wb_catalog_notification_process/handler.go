@@ -94,6 +94,14 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 	}
 
 	parser := wbcatalognotification.New(h.browserStorage)
+
+	h.loggerService.Info(
+		"prepare parse wb catalog",
+		slog.Int64("notification", notification.ID),
+		slog.Int64("proxy", proxy.ID),
+		slog.Int64("user_agent", userAgent.ID),
+	)
+
 	products, err := parser.Parse(
 		wbcatalognotification.ParseParams{
 			NotificationID: notification.ID,
