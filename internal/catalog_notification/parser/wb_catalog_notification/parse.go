@@ -25,7 +25,7 @@ type ParseParams struct {
 }
 
 func (s *Service) Parse(params ParseParams) ([]Product, error) {
-	browser, err := s.browserStorage.GetOrCreate(params.NotificationID, params.Proxy)
+	browser, err := s.browserStorage.GetOrCreate(1, params.Proxy)
 	if err != nil {
 		return nil, err
 	}
@@ -44,12 +44,12 @@ func (s *Service) Parse(params ParseParams) ([]Product, error) {
 		return nil, err
 	}
 
-	_, err = page.Timeout(60 * time.Second).Element(".product-card")
+	_, err = page.Timeout(60 * time.Second).Element(".catalog-page__content .product-card")
 	if err != nil {
 		return nil, fmt.Errorf("карточка товара не найдена")
 	}
 
-	cardEls, err := page.Elements(".product-card")
+	cardEls, err := page.Elements(".catalog-page__content .product-card")
 	if err != nil {
 		return nil, fmt.Errorf("карточки товаров не найдены")
 	}
