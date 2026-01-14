@@ -41,7 +41,8 @@ func (s *Service) Parse(params ParseParams) ([]Product, error) {
 	})
 	err = page.Navigate(params.URL)
 	if err != nil {
-		return nil, err
+		s.browserStorage.Remove(1)
+		return nil, fmt.Errorf("ошибка навигации")
 	}
 
 	_, err = page.Timeout(60 * time.Second).Element(".catalog-page__content .product-card")
