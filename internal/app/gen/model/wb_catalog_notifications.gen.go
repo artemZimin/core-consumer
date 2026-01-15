@@ -23,6 +23,7 @@ type WbCatalogNotification struct {
 	UpdatedAt *time.Time `gorm:"column:updated_at" json:"updated_at"`
 	StopWords *string    `gorm:"column:stop_words" json:"stop_words"`
 	PlusWords *string    `gorm:"column:plus_words" json:"plus_words"`
+	Cookie    *string    `gorm:"column:cookie" json:"cookie"`
 }
 
 // TableName WbCatalogNotification's table name

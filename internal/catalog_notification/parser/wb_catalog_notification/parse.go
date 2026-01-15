@@ -11,10 +11,11 @@ import (
 )
 
 type Product struct {
-	URL   string
-	Img   string
-	Price int64
-	Name  string
+	URL      string
+	Img      string
+	Price    int64
+	Quantity int64
+	Name     string
 }
 
 type ParseParams struct {
@@ -22,6 +23,7 @@ type ParseParams struct {
 	URL            string
 	Proxy          string
 	UserAgent      string
+	Cookie         string
 	MaxPrice       int64
 }
 

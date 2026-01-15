@@ -70,16 +70,11 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 	if notification.Status != constants.WbCatalogNotificationStatusInProgress {
 		h.loggerService.Info("stop", slog.Float64("id", id))
 
-		if err := h.browserStorage.Remove(notification.ID); err != nil {
-			h.loggerService.Error(
-				"cannot remove browser",
-				slog.Float64("id", id),
-				slog.String("error", err.Error()),
-				slog.String("status", notification.Status),
-			)
-		}
-
 		return nil
+	}
+
+	if notification.Cookie == nil {
+		return fmt.Errorf("cookie not set for notification %d", notification.ID)
 	}
 
 	h.loggerService.Info("slep", slog.Any("sec", notification.Interval))
@@ -103,13 +98,14 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		slog.Int64("user_agent", userAgent.ID),
 	)
 
-	products, err := parser.Parse(
+	products, err := parser.ParseV2(
 		wbcatalognotification.ParseParams{
 			NotificationID: notification.ID,
 			URL:            notification.URL,
 			Proxy:          proxy.Data,
 			UserAgent:      userAgent.Data,
 			MaxPrice:       int64(notification.MaxPrice),
+			Cookie:         *notification.Cookie,
 		},
 	)
 	if err != nil {
@@ -187,6 +183,7 @@ ProductsLoop:
 				NotificationName: notification.Name,
 				ProductURL:       product.URL,
 				Price:            product.Price,
+				Quantity:         product.Quantity,
 			},
 		); err != nil {
 			h.loggerService.Error(
