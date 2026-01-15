@@ -1,6 +1,7 @@
 package browserstorage
 
 import (
+	"core-consumer/config"
 	"fmt"
 	"strings"
 
@@ -10,10 +11,11 @@ import (
 )
 
 type Storage struct {
+	cfg      *config.Config
 	browsers map[int64]*rod.Browser
 }
 
-func New() *Storage {
+func New(cfg *config.Config) *Storage {
 	return &Storage{
 		browsers: make(map[int64]*rod.Browser),
 	}
@@ -38,7 +40,7 @@ func (s *Storage) GetOrCreate(id int64, proxyStr string) (*rod.Browser, error) {
 	proxy := parts[0]
 	user := authParts[0]
 	password := authParts[1]
-	l := launcher.New().Bin("/usr/bin/google-chrome").Headless(true).NoSandbox(true)
+	l := launcher.New().Bin("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome").Headless(true).NoSandbox(true)
 	l = l.Set(flags.ProxyServer, proxy)
 
 	controlURL, err := l.Launch()

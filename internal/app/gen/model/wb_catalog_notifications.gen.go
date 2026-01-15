@@ -21,6 +21,8 @@ type WbCatalogNotification struct {
 	UserID    int64      `gorm:"column:user_id;not null" json:"user_id"`
 	CreatedAt *time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt *time.Time `gorm:"column:updated_at" json:"updated_at"`
+	StopWords *string    `gorm:"column:stop_words" json:"stop_words"`
+	PlusWords *string    `gorm:"column:plus_words" json:"plus_words"`
 }
 
 // TableName WbCatalogNotification's table name

@@ -16,6 +16,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -112,7 +113,13 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		},
 	)
 	if err != nil {
-		h.loggerService.Error("parse error", slog.String("error", err.Error()))
+		h.loggerService.Error(
+			"parse error",
+			slog.String("error", err.Error()),
+			slog.Int64("notification", notification.ID),
+			slog.Int64("proxy", proxy.ID),
+			slog.Int64("user_agent", userAgent.ID),
+		)
 
 		h.producer.PublishJob(ctx, &rabbitmq.Job{
 			Job: constants.JobWbCatalogNotificationProccess,
@@ -124,7 +131,31 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		return nil
 	}
 
+ProductsLoop:
 	for _, product := range products {
+		if notification.StopWords != nil {
+			stopWords := strings.Split(strings.ToLower(*notification.StopWords), ",")
+			name := strings.ToLower(product.Name)
+
+			for _, stopWord := range stopWords {
+				if strings.Contains(name, stopWord) {
+					continue ProductsLoop
+				}
+			}
+		}
+
+		if notification.PlusWords != nil {
+			plusWords := strings.Split(strings.ToLower(*notification.PlusWords), ",")
+			name := strings.ToLower(product.Name)
+
+			for _, plusWord := range plusWords {
+				if !strings.Contains(name, plusWord) {
+					continue ProductsLoop
+				}
+			}
+		}
+
+		fmt.Println(product.Name)
 		_, err := h.productsRepo.FindByUrlAndPriceInCatalogNotification(
 			wbproduct.FindByUrlAndPriceInCatalogNotificationParams{
 				NotificationID: notification.ID,

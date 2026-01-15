@@ -14,6 +14,7 @@ type Product struct {
 	URL   string
 	Img   string
 	Price int64
+	Name  string
 }
 
 type ParseParams struct {
@@ -102,10 +103,21 @@ func (s *Service) Parse(params ParseParams) ([]Product, error) {
 			return nil, fmt.Errorf("аттрибут src не найден")
 		}
 
+		nameEl, err := cardEl.Element(".product-card__name")
+		if err != nil {
+			return nil, fmt.Errorf("имя товара не найдено")
+		}
+
+		nameText, err := nameEl.Text()
+		if err != nil {
+			return nil, fmt.Errorf("невозможно получить текст имени товара")
+		}
+
 		products = append(products, Product{
 			URL:   *href,
 			Img:   *img,
 			Price: price,
+			Name:  nameText,
 		})
 	}
 

@@ -40,7 +40,7 @@ func Bootstrap() {
 		panic(err)
 	}
 
-	browserStorage := browserstorage.New()
+	browserStorage := browserstorage.New(cfg)
 
 	stealthModule := stealth.Init(db, q)
 	telegramBotModule, err := telegrambot.Init(

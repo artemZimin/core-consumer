@@ -36,6 +36,8 @@ func newWbCatalogNotification(db *gorm.DB, opts ...gen.DOOption) wbCatalogNotifi
 	_wbCatalogNotification.UserID = field.NewInt64(tableName, "user_id")
 	_wbCatalogNotification.CreatedAt = field.NewTime(tableName, "created_at")
 	_wbCatalogNotification.UpdatedAt = field.NewTime(tableName, "updated_at")
+	_wbCatalogNotification.StopWords = field.NewString(tableName, "stop_words")
+	_wbCatalogNotification.PlusWords = field.NewString(tableName, "plus_words")
 
 	_wbCatalogNotification.fillFieldMap()
 
@@ -55,6 +57,8 @@ type wbCatalogNotification struct {
 	UserID    field.Int64
 	CreatedAt field.Time
 	UpdatedAt field.Time
+	StopWords field.String
+	PlusWords field.String
 
 	fieldMap map[string]field.Expr
 }
@@ -80,6 +84,8 @@ func (w *wbCatalogNotification) updateTableName(table string) *wbCatalogNotifica
 	w.UserID = field.NewInt64(table, "user_id")
 	w.CreatedAt = field.NewTime(table, "created_at")
 	w.UpdatedAt = field.NewTime(table, "updated_at")
+	w.StopWords = field.NewString(table, "stop_words")
+	w.PlusWords = field.NewString(table, "plus_words")
 
 	w.fillFieldMap()
 
@@ -108,7 +114,7 @@ func (w *wbCatalogNotification) GetFieldByName(fieldName string) (field.OrderExp
 }
 
 func (w *wbCatalogNotification) fillFieldMap() {
-	w.fieldMap = make(map[string]field.Expr, 9)
+	w.fieldMap = make(map[string]field.Expr, 11)
 	w.fieldMap["id"] = w.ID
 	w.fieldMap["name"] = w.Name
 	w.fieldMap["url"] = w.URL
@@ -118,6 +124,8 @@ func (w *wbCatalogNotification) fillFieldMap() {
 	w.fieldMap["user_id"] = w.UserID
 	w.fieldMap["created_at"] = w.CreatedAt
 	w.fieldMap["updated_at"] = w.UpdatedAt
+	w.fieldMap["stop_words"] = w.StopWords
+	w.fieldMap["plus_words"] = w.PlusWords
 }
 
 func (w wbCatalogNotification) clone(db *gorm.DB) wbCatalogNotification {
