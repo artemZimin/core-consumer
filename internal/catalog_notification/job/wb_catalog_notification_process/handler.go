@@ -151,7 +151,6 @@ ProductsLoop:
 			}
 		}
 
-		fmt.Println(product.Name)
 		_, err := h.productsRepo.FindByUrlAndPriceInCatalogNotification(
 			wbproduct.FindByUrlAndPriceInCatalogNotificationParams{
 				NotificationID: notification.ID,
