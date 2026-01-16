@@ -2,7 +2,10 @@ include .env
 export $(shell sed 's/=.*//' .env)
 
 build:
-	go build ./cmd/app
+	go build -o core-consumer ./cmd/app
+
+start:
+	nohup ./core-consumer > output.log 2>&1 &
 
 fmt:
 	go fmt ./...

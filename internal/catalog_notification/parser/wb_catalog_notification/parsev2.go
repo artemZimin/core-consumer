@@ -54,12 +54,13 @@ func (s *Service) ParseV2(params ParseParams) ([]Product, error) {
 	transport := &http.Transport{
 		Proxy: http.ProxyURL(parsedURL),
 		DialContext: (&net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
+			Timeout:   2 * time.Second,
+			KeepAlive: 2 * time.Second,
 		}).DialContext,
 	}
 	client := &http.Client{
 		Transport: transport,
+		Timeout:   2 * time.Second,
 	}
 	req, err := http.NewRequest("GET", params.URL, nil)
 	if err != nil {
