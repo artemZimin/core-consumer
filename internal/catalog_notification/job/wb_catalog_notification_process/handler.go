@@ -129,6 +129,14 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 
 ProductsLoop:
 	for _, product := range products {
+		if notification.MinPrice != nil && int64(*notification.MinPrice) > product.Price {
+			continue
+		}
+
+		if int64(notification.MaxPrice) < product.Price {
+			continue
+		}
+
 		if notification.StopWords != nil {
 			stopWords := strings.Split(strings.ToLower(*notification.StopWords), ",")
 			name := strings.ToLower(product.Name)

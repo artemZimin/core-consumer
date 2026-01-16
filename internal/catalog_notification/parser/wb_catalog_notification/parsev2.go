@@ -114,10 +114,6 @@ func (s *Service) ParseV2(params ParseParams) ([]Product, error) {
 			strID,
 		)
 
-		if product.Price > params.MaxPrice {
-			continue
-		}
-
 		products = append(products, product)
 	}
 
