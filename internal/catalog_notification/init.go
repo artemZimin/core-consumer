@@ -8,8 +8,11 @@ import (
 	"core-consumer/internal/catalog_notification/constants"
 	wbcatalognotificationprocess "core-consumer/internal/catalog_notification/job/wb_catalog_notification_process"
 	wbcatalognotificationstart "core-consumer/internal/catalog_notification/job/wb_catalog_notification_start"
+	wbstocknotificationprocess "core-consumer/internal/catalog_notification/job/wb_stock_notification_process"
+	wbstocknotificationstart "core-consumer/internal/catalog_notification/job/wb_stock_notification_start"
 	wbcatalognotification "core-consumer/internal/catalog_notification/repositories/wb_catalog_notification"
 	wbproduct "core-consumer/internal/catalog_notification/repositories/wb_product"
+	wbstocknotification "core-consumer/internal/catalog_notification/repositories/wb_stock_notification"
 	"core-consumer/internal/stealth"
 	telegrambot "core-consumer/internal/telegram_bot"
 
@@ -48,6 +51,29 @@ func Init(
 			stealthModule.ProxyRepo,
 			stealthModule.UserAgentRepo,
 			productsRepo,
+			telgramBotModule.TgBot,
+		).Handle,
+	)
+
+	wbStockNotificationRepo := wbstocknotification.New(q, db)
+
+	rabbitConumer.RegisterHandler(
+		constants.JobWbStockNotificationStart,
+		wbstocknotificationstart.New(
+			loggerService,
+			wbStockNotificationRepo,
+			producer,
+		).Handle,
+	)
+
+	rabbitConumer.RegisterHandler(
+		constants.JobWbStockNotificationProccess,
+		wbstocknotificationprocess.New(
+			loggerService,
+			wbStockNotificationRepo,
+			producer,
+			stealthModule.ProxyRepo,
+			stealthModule.UserAgentRepo,
 			telgramBotModule.TgBot,
 		).Handle,
 	)

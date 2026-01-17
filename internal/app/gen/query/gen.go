@@ -34,6 +34,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		WbCatalogNotificationLog:     newWbCatalogNotificationLog(db, opts...),
 		WbCatalogNotificationProduct: newWbCatalogNotificationProduct(db, opts...),
 		WbCatalogNotificationProxy:   newWbCatalogNotificationProxy(db, opts...),
+		WbStockNotification:          newWbStockNotification(db, opts...),
 	}
 }
 
@@ -56,6 +57,7 @@ type Query struct {
 	WbCatalogNotificationLog     wbCatalogNotificationLog
 	WbCatalogNotificationProduct wbCatalogNotificationProduct
 	WbCatalogNotificationProxy   wbCatalogNotificationProxy
+	WbStockNotification          wbStockNotification
 }
 
 func (q *Query) Available() bool { return q.db != nil }
@@ -79,6 +81,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		WbCatalogNotificationLog:     q.WbCatalogNotificationLog.clone(db),
 		WbCatalogNotificationProduct: q.WbCatalogNotificationProduct.clone(db),
 		WbCatalogNotificationProxy:   q.WbCatalogNotificationProxy.clone(db),
+		WbStockNotification:          q.WbStockNotification.clone(db),
 	}
 }
 
@@ -109,6 +112,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		WbCatalogNotificationLog:     q.WbCatalogNotificationLog.replaceDB(db),
 		WbCatalogNotificationProduct: q.WbCatalogNotificationProduct.replaceDB(db),
 		WbCatalogNotificationProxy:   q.WbCatalogNotificationProxy.replaceDB(db),
+		WbStockNotification:          q.WbStockNotification.replaceDB(db),
 	}
 }
 
@@ -129,6 +133,7 @@ type queryCtx struct {
 	WbCatalogNotificationLog     *wbCatalogNotificationLogDo
 	WbCatalogNotificationProduct *wbCatalogNotificationProductDo
 	WbCatalogNotificationProxy   *wbCatalogNotificationProxyDo
+	WbStockNotification          *wbStockNotificationDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
@@ -149,6 +154,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		WbCatalogNotificationLog:     q.WbCatalogNotificationLog.WithContext(ctx),
 		WbCatalogNotificationProduct: q.WbCatalogNotificationProduct.WithContext(ctx),
 		WbCatalogNotificationProxy:   q.WbCatalogNotificationProxy.WithContext(ctx),
+		WbStockNotification:          q.WbStockNotification.WithContext(ctx),
 	}
 }
 

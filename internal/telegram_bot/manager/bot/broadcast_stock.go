@@ -6,12 +6,12 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type BroadcastWbCatalogNotificationParam struct {
-	ImgURL, NotificationName, ProductURL string
-	Price, Quantity                      int64
+type BroadcastWbStockNotificationParam struct {
+	ImgURL, NotificationName, ProductURL, ProductName string
+	Price, Quantity                                   int64
 }
 
-func (m *Manager) BroadcastWbCatalogNotification(params BroadcastWbCatalogNotificationParam) error {
+func (m *Manager) BroadcastWbStockNotification(params BroadcastWbStockNotificationParam) error {
 	users, err := m.usersRepo.GetAll()
 	if err != nil {
 		return err
@@ -19,8 +19,9 @@ func (m *Manager) BroadcastWbCatalogNotification(params BroadcastWbCatalogNotifi
 
 	for _, user := range users {
 		msg := tgbotapi.NewMessage(user.UserID, "")
-		caption := "🆕<strong>WB новый товар в каталоге</strong>\n\n"
+		caption := "📦<strong>WB В НАЛИЧИИ</strong>\n\n"
 		caption += fmt.Sprintf("🏷️<strong>Категория</strong>: %s\n\n", params.NotificationName)
+		caption += fmt.Sprintf("📝<strong>Название товара</strong>: %s\n\n", params.ProductName)
 		caption += fmt.Sprintf("💰<strong>Цена</strong>: %d\n\n", params.Price)
 		caption += fmt.Sprintf("📊<strong>Количество</strong>: %d", params.Quantity)
 		msg.Text = caption
