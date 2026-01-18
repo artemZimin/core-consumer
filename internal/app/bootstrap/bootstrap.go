@@ -11,6 +11,8 @@ import (
 	catalognotification "core-consumer/internal/catalog_notification"
 	"core-consumer/internal/stealth"
 	telegrambot "core-consumer/internal/telegram_bot"
+	"io"
+	"os"
 )
 
 func Bootstrap() {
@@ -19,7 +21,25 @@ func Bootstrap() {
 		panic(err)
 	}
 
-	loggerService := logger.New()
+	var loggerOut io.Writer
+
+	if cfg.LogFile != "" {
+		logFile, err := os.OpenFile(
+			cfg.LogFile,
+			os.O_CREATE|os.O_WRONLY|os.O_APPEND,
+			06444,
+		)
+		if err != nil {
+			panic(err)
+		}
+		defer logFile.Close()
+
+		loggerOut = logFile
+	} else {
+		loggerOut = os.Stdout
+	}
+
+	loggerService := logger.New(cfg, loggerOut)
 
 	db, err := postgres.Connect(cfg)
 	if err != nil {
@@ -35,7 +55,7 @@ func Bootstrap() {
 
 	rabbitProducer, err := rabbitmq.NewProducer(rabbitConn, cfg)
 
-	rabbitConsumer, err := rabbitmq.NewConsumer(rabbitConn, cfg)
+	rabbitConsumer, err := rabbitmq.NewConsumer(rabbitConn, cfg, loggerService)
 	if err != nil {
 		panic(err)
 	}

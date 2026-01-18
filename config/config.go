@@ -12,6 +12,8 @@ type Config struct {
 	RabbitMQConsumeWorkersCount int    `env:"RABBIMQ_CONSUME_WORKERS_COUNT" env-default:""`
 	ChromeBin                   string `env:"CHROME_BIN" env-default:""`
 	TelegramBotToken            string `env:"TELEGRAM_BOT_TOKEN" env-default:""`
+	AppName                     string `env:"APP_NAME" env-default:""`
+	LogFile                     string `env:"LOG_FILE" env-default:""`
 }
 
 func Load() (*Config, error) {

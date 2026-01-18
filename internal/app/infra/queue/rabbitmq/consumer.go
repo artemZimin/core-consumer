@@ -23,7 +23,7 @@ type Consumer struct {
 
 type JobHandler func(ctx context.Context, job *Job) error
 
-func NewConsumer(rmq *RabbitMQ, cfg *config.Config) (*Consumer, error) {
+func NewConsumer(rmq *RabbitMQ, cfg *config.Config, loggerService *logger.Logger) (*Consumer, error) {
 	ch := rmq.GetChannel()
 
 	_, err := ch.QueueDeclare(
@@ -48,7 +48,7 @@ func NewConsumer(rmq *RabbitMQ, cfg *config.Config) (*Consumer, error) {
 		queueName:     cfg.RabbitMQQueueName,
 		handlers:      make(map[string]JobHandler),
 		workerCount:   cfg.RabbitMQConsumeWorkersCount,
-		loggerService: logger.New(),
+		loggerService: loggerService,
 	}, nil
 }
 
