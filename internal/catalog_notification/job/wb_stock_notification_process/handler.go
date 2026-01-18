@@ -49,6 +49,13 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		return fmt.Errorf("id not found")
 	}
 
+	countNotifications, err := h.wbStockNotificationRepo.CountInStatus(
+		constants.WbCatalogNotificationStatusInProgress,
+	)
+	if err != nil {
+		return fmt.Errorf("fail countNotifications")
+	}
+
 	notification, err := h.wbStockNotificationRepo.FindByID(int64(id))
 	if err != nil {
 		return fmt.Errorf("notification not found")
@@ -81,6 +88,7 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 	h.loggerService.Info(
 		"prepare parse wb catalog",
 		slog.Int64("stock_notification", notification.ID),
+		slog.Int64("stock_notification_count", countNotifications),
 		slog.Int64("proxy", proxy.ID),
 		slog.Int64("user_agent", userAgent.ID),
 	)
@@ -98,6 +106,7 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 			"parse error",
 			slog.String("error", err.Error()),
 			slog.Int64("stock_notification", notification.ID),
+			slog.Int64("stock_notification_count", countNotifications),
 			slog.Int64("proxy", proxy.ID),
 			slog.Int64("user_agent", userAgent.ID),
 		)
@@ -116,6 +125,7 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		"stock_notification success",
 		slog.Int("products_count", len(products)),
 		slog.Int64("stock_notification", notification.ID),
+		slog.Int64("stock_notification_count", countNotifications),
 		slog.Int64("proxy", proxy.ID),
 		slog.Int64("user_agent", userAgent.ID),
 	)
