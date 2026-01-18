@@ -112,6 +112,14 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		return nil
 	}
 
+	h.loggerService.Info(
+		"stock_notification success",
+		slog.Int("products_count", len(products)),
+		slog.Int64("stock_notification", notification.ID),
+		slog.Int64("proxy", proxy.ID),
+		slog.Int64("user_agent", userAgent.ID),
+	)
+
 	for _, product := range products {
 		isInStock := product.Quantity > 0
 

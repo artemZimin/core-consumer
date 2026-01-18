@@ -127,6 +127,14 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		return nil
 	}
 
+	h.loggerService.Info(
+		"catalog_notification success",
+		slog.Int("products_count", len(products)),
+		slog.Int64("catalog_notification", notification.ID),
+		slog.Int64("proxy", proxy.ID),
+		slog.Int64("user_agent", userAgent.ID),
+	)
+
 ProductsLoop:
 	for _, product := range products {
 		if notification.MinPrice != nil && int64(*notification.MinPrice) > product.Price {
