@@ -158,7 +158,7 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 
 	isInStock := false
 	for _, product := range products {
-		isInStock = product.Quantity > 0
+		isInStock = product.Quantity > 0 && (notification.MaxPrice == nil || int64(*notification.MaxPrice) > product.Price)
 		if isInStock {
 			break
 		}
