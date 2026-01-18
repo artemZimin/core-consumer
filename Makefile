@@ -5,7 +5,7 @@ build:
 	go build -o core-consumer ./cmd/app
 
 start:
-	nohup ./core-consumer > output.log 2>&1 &
+	nohup ./core-consumer > nohup.log 2>&1 &
 
 fmt:
 	go fmt ./...
