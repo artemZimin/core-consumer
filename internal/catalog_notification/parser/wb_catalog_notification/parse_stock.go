@@ -48,13 +48,13 @@ func (s *Service) ParseStock(params ParseStockParams) ([]StockProduct, error) {
 	transport := &http.Transport{
 		Proxy: http.ProxyURL(parsedURL),
 		DialContext: (&net.Dialer{
-			Timeout:   2 * time.Second,
-			KeepAlive: 2 * time.Second,
+			Timeout:   5 * time.Second,
+			KeepAlive: 5 * time.Second,
 		}).DialContext,
 	}
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   2 * time.Second,
+		Timeout:   5 * time.Second,
 	}
 	req, err := http.NewRequest("GET", params.URL, nil)
 	if err != nil {
