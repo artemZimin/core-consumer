@@ -22,16 +22,10 @@ func (m *Manager) BroadcastWbCatalogNotification(params BroadcastWbCatalogNotifi
 		caption := "🆕<strong>WB новый товар в каталоге</strong>\n\n"
 		caption += fmt.Sprintf("🏷️<strong>Категория</strong>: %s\n\n", params.NotificationName)
 		caption += fmt.Sprintf("💰<strong>Цена</strong>: %d\n\n", params.Price)
-		caption += fmt.Sprintf("📊<strong>Количество</strong>: %d", params.Quantity)
+		caption += fmt.Sprintf("📊<strong>Количество</strong>: %d\n\n", params.Quantity)
+		caption += fmt.Sprintf(`<strong><a href="%s">%s</a></strong>`, params.ProductURL, params.ProductURL)
 		msg.Text = caption
 
-		inlineKeyboard := tgbotapi.NewInlineKeyboardMarkup(
-			tgbotapi.NewInlineKeyboardRow(
-				tgbotapi.NewInlineKeyboardButtonURL("Открыть на сайте", params.ProductURL),
-			),
-		)
-
-		msg.ReplyMarkup = inlineKeyboard
 		msg.ParseMode = "HTML"
 
 		_, err := m.api.Send(msg)
