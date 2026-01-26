@@ -19,9 +19,9 @@ func (m *Manager) BroadcastWbStockNotification(params BroadcastWbStockNotificati
 
 	for _, user := range users {
 		msg := tgbotapi.NewMessage(user.UserID, "")
-		caption := fmt.Sprintf("📝<strong>Название товара</strong>: %s\n", params.ProductName)
-		caption += fmt.Sprintf("💰<strong>Цена</strong>: %d\n", params.Price)
-		caption += fmt.Sprintf("📊<strong>Количество</strong>: %d\n", params.Quantity)
+		caption := fmt.Sprintf("📝<strong>Название товара</strong>: %s\n\n", params.ProductName)
+		caption += fmt.Sprintf("💰<strong>Цена</strong>: %d\n\n", params.Price)
+		caption += fmt.Sprintf("📊<strong>Количество</strong>: %d\n\n", params.Quantity)
 		caption += fmt.Sprintf(`<strong><a href="%s">%s</a></strong>`, params.ProductURL, params.ProductURL)
 		msg.Text = caption
 
