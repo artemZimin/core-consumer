@@ -134,10 +134,24 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		slog.Int64("user_agent", userAgent.ID),
 	)
 
+	var maxPrice *int32
+
+	if notification.WbProductPriceID != nil {
+		price, err := h.wbProductPriceRepo.FindByID(*notification.WbProductPriceID)
+		if err != nil {
+			return err
+		}
+		currentPrice := int32(float32(price.MaxPrice) * 1.1)
+
+		maxPrice = &currentPrice
+	} else {
+		maxPrice = notification.MaxPrice
+	}
+
 	for _, product := range products {
 		isInStock := product.Quantity > 0
 
-		if notification.MaxPrice != nil && int64(*notification.MaxPrice) < product.Price {
+		if maxPrice != nil && int64(*maxPrice) < product.Price {
 			continue
 		}
 
@@ -158,20 +172,6 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 				)
 			}
 		}
-	}
-
-	var maxPrice *int32
-
-	if notification.WbProductPriceID != nil {
-		price, err := h.wbProductPriceRepo.FindByID(*notification.WbProductPriceID)
-		if err != nil {
-			return err
-		}
-		currentPrice := int32(float32(price.MaxPrice) * 1.1)
-
-		maxPrice = &currentPrice
-	} else {
-		maxPrice = notification.MaxPrice
 	}
 
 	isInStock := false
