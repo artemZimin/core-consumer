@@ -12,17 +12,18 @@ const TableNameWbStockNotification = "wb_stock_notifications"
 
 // WbStockNotification mapped from table <wb_stock_notifications>
 type WbStockNotification struct {
-	ID        int64      `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	Name      string     `gorm:"column:name;not null" json:"name"`
-	URL       string     `gorm:"column:url;not null" json:"url"`
-	Status    string     `gorm:"column:status;not null;default:ready" json:"status"`
-	Interval  int32      `gorm:"column:interval;not null" json:"interval"`
-	MaxPrice  *int32     `gorm:"column:max_price" json:"max_price"`
-	UserID    int64      `gorm:"column:user_id;not null" json:"user_id"`
-	IsInStock bool       `gorm:"column:is_in_stock;not null" json:"is_in_stock"`
-	Cookie    *string    `gorm:"column:cookie" json:"cookie"`
-	CreatedAt *time.Time `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt *time.Time `gorm:"column:updated_at" json:"updated_at"`
+	ID               int64      `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	Name             string     `gorm:"column:name;not null" json:"name"`
+	URL              string     `gorm:"column:url;not null" json:"url"`
+	Status           string     `gorm:"column:status;not null;default:ready" json:"status"`
+	Interval         int32      `gorm:"column:interval;not null" json:"interval"`
+	MaxPrice         *int32     `gorm:"column:max_price" json:"max_price"`
+	UserID           int64      `gorm:"column:user_id;not null" json:"user_id"`
+	IsInStock        bool       `gorm:"column:is_in_stock;not null" json:"is_in_stock"`
+	Cookie           *string    `gorm:"column:cookie" json:"cookie"`
+	CreatedAt        *time.Time `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt        *time.Time `gorm:"column:updated_at" json:"updated_at"`
+	WbProductPriceID *int64     `gorm:"column:wb_product_price_id" json:"wb_product_price_id"`
 }
 
 // TableName WbStockNotification's table name

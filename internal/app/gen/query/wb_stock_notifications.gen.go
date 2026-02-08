@@ -38,6 +38,7 @@ func newWbStockNotification(db *gorm.DB, opts ...gen.DOOption) wbStockNotificati
 	_wbStockNotification.Cookie = field.NewString(tableName, "cookie")
 	_wbStockNotification.CreatedAt = field.NewTime(tableName, "created_at")
 	_wbStockNotification.UpdatedAt = field.NewTime(tableName, "updated_at")
+	_wbStockNotification.WbProductPriceID = field.NewInt64(tableName, "wb_product_price_id")
 
 	_wbStockNotification.fillFieldMap()
 
@@ -47,18 +48,19 @@ func newWbStockNotification(db *gorm.DB, opts ...gen.DOOption) wbStockNotificati
 type wbStockNotification struct {
 	wbStockNotificationDo wbStockNotificationDo
 
-	ALL       field.Asterisk
-	ID        field.Int64
-	Name      field.String
-	URL       field.String
-	Status    field.String
-	Interval  field.Int32
-	MaxPrice  field.Int32
-	UserID    field.Int64
-	IsInStock field.Bool
-	Cookie    field.String
-	CreatedAt field.Time
-	UpdatedAt field.Time
+	ALL              field.Asterisk
+	ID               field.Int64
+	Name             field.String
+	URL              field.String
+	Status           field.String
+	Interval         field.Int32
+	MaxPrice         field.Int32
+	UserID           field.Int64
+	IsInStock        field.Bool
+	Cookie           field.String
+	CreatedAt        field.Time
+	UpdatedAt        field.Time
+	WbProductPriceID field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -86,6 +88,7 @@ func (w *wbStockNotification) updateTableName(table string) *wbStockNotification
 	w.Cookie = field.NewString(table, "cookie")
 	w.CreatedAt = field.NewTime(table, "created_at")
 	w.UpdatedAt = field.NewTime(table, "updated_at")
+	w.WbProductPriceID = field.NewInt64(table, "wb_product_price_id")
 
 	w.fillFieldMap()
 
@@ -114,7 +117,7 @@ func (w *wbStockNotification) GetFieldByName(fieldName string) (field.OrderExpr,
 }
 
 func (w *wbStockNotification) fillFieldMap() {
-	w.fieldMap = make(map[string]field.Expr, 11)
+	w.fieldMap = make(map[string]field.Expr, 12)
 	w.fieldMap["id"] = w.ID
 	w.fieldMap["name"] = w.Name
 	w.fieldMap["url"] = w.URL
@@ -126,6 +129,7 @@ func (w *wbStockNotification) fillFieldMap() {
 	w.fieldMap["cookie"] = w.Cookie
 	w.fieldMap["created_at"] = w.CreatedAt
 	w.fieldMap["updated_at"] = w.UpdatedAt
+	w.fieldMap["wb_product_price_id"] = w.WbProductPriceID
 }
 
 func (w wbStockNotification) clone(db *gorm.DB) wbStockNotification {

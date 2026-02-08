@@ -12,6 +12,7 @@ import (
 	wbstocknotificationstart "core-consumer/internal/catalog_notification/job/wb_stock_notification_start"
 	wbcatalognotification "core-consumer/internal/catalog_notification/repositories/wb_catalog_notification"
 	wbproduct "core-consumer/internal/catalog_notification/repositories/wb_product"
+	wbproductprice "core-consumer/internal/catalog_notification/repositories/wb_product_price"
 	wbstocknotification "core-consumer/internal/catalog_notification/repositories/wb_stock_notification"
 	"core-consumer/internal/stealth"
 	telegrambot "core-consumer/internal/telegram_bot"
@@ -66,6 +67,8 @@ func Init(
 		).Handle,
 	)
 
+	wbProductPriceRepo := wbproductprice.New(q, db)
+
 	rabbitConumer.RegisterHandler(
 		constants.JobWbStockNotificationProccess,
 		wbstocknotificationprocess.New(
@@ -75,6 +78,7 @@ func Init(
 			stealthModule.ProxyRepo,
 			stealthModule.UserAgentRepo,
 			telgramBotModule.TgBot,
+			wbProductPriceRepo,
 		).Handle,
 	)
 

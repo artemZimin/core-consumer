@@ -6,6 +6,7 @@ import (
 	"core-consumer/internal/app/infra/queue/rabbitmq"
 	"core-consumer/internal/catalog_notification/constants"
 	wbcatalognotification "core-consumer/internal/catalog_notification/parser/wb_catalog_notification"
+	wbproductprice "core-consumer/internal/catalog_notification/repositories/wb_product_price"
 	wbstocknotification "core-consumer/internal/catalog_notification/repositories/wb_stock_notification"
 	"core-consumer/internal/stealth/repository/proxy"
 	useragent "core-consumer/internal/stealth/repository/user_agent"
@@ -22,6 +23,7 @@ type Handler struct {
 	proxyRepo               *proxy.Repository
 	userAgentRepo           *useragent.Repository
 	tgBot                   *bot.Manager
+	wbProductPriceRepo      *wbproductprice.Repository
 }
 
 func New(
@@ -31,6 +33,7 @@ func New(
 	proxyRepo *proxy.Repository,
 	userAgentRepo *useragent.Repository,
 	tgBot *bot.Manager,
+	wbProductPriceRepo *wbproductprice.Repository,
 ) *Handler {
 	return &Handler{
 		loggerService:           loggerService,
@@ -39,6 +42,7 @@ func New(
 		proxyRepo:               proxyRepo,
 		userAgentRepo:           userAgentRepo,
 		tgBot:                   tgBot,
+		wbProductPriceRepo:      wbProductPriceRepo,
 	}
 }
 
@@ -156,9 +160,23 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		}
 	}
 
+	var maxPrice *int32
+
+	if notification.WbProductPriceID != nil {
+		price, err := h.wbProductPriceRepo.FindByID(*notification.WbProductPriceID)
+		if err != nil {
+			return err
+		}
+		currentPrice := int32(float32(price.MaxPrice) * 1.1)
+
+		maxPrice = &currentPrice
+	} else {
+		maxPrice = notification.MaxPrice
+	}
+
 	isInStock := false
 	for _, product := range products {
-		isInStock = product.Quantity > 0 && (notification.MaxPrice == nil || int64(*notification.MaxPrice) > product.Price)
+		isInStock = product.Quantity > 0 && (maxPrice == nil || int64(*maxPrice) > product.Price)
 		if isInStock {
 			break
 		}
