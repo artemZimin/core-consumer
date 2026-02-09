@@ -80,11 +80,27 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 	proxy, err := h.proxyRepo.FindRanbom()
 	if err != nil {
 		h.loggerService.Error("proxy not found", slog.String("error", err.Error()))
+		h.producer.PublishJob(ctx, &rabbitmq.Job{
+			Job: constants.JobWbStockNotificationProccess,
+			Data: map[string]any{
+				"id": notification.ID,
+			},
+		})
+
+		return nil
 	}
 
 	userAgent, err := h.userAgentRepo.FindRandom()
 	if err != nil {
 		h.loggerService.Error("user agent not found", slog.String("error", err.Error()))
+		h.producer.PublishJob(ctx, &rabbitmq.Job{
+			Job: constants.JobWbStockNotificationProccess,
+			Data: map[string]any{
+				"id": notification.ID,
+			},
+		})
+
+		return nil
 	}
 
 	parser := wbcatalognotification.New(nil)
