@@ -267,7 +267,7 @@ ProductsLoop:
 			}
 		}
 		stopWords := make([]string, 0)
-		if stopWords != nil {
+		if priceInfo.StopWords != nil {
 			stopWords = strings.Split(strings.ToLower(*priceInfo.StopWords), ",")
 		}
 
