@@ -42,6 +42,8 @@ func Init(
 
 	productsRepo := wbproduct.New(db, q)
 
+	wbProductPriceRepo := wbproductprice.New(q, db)
+
 	rabbitConumer.RegisterHandler(
 		constants.JobWbCatalogNotificationProccess,
 		wbcatalognotificationprocess.New(
@@ -53,6 +55,7 @@ func Init(
 			stealthModule.UserAgentRepo,
 			productsRepo,
 			telgramBotModule.TgBot,
+			wbProductPriceRepo,
 		).Handle,
 	)
 
@@ -66,8 +69,6 @@ func Init(
 			producer,
 		).Handle,
 	)
-
-	wbProductPriceRepo := wbproductprice.New(q, db)
 
 	rabbitConumer.RegisterHandler(
 		constants.JobWbStockNotificationProccess,

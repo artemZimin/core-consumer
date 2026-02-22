@@ -25,6 +25,7 @@ type WbCatalogNotification struct {
 	PlusWords *string    `gorm:"column:plus_words" json:"plus_words"`
 	Cookie    *string    `gorm:"column:cookie" json:"cookie"`
 	MinPrice  *int32     `gorm:"column:min_price" json:"min_price"`
+	UsePrices bool       `gorm:"column:use_prices;not null" json:"use_prices"`
 }
 
 // TableName WbCatalogNotification's table name

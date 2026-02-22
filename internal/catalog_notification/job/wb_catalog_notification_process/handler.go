@@ -10,6 +10,7 @@ import (
 	wbcatalognotification "core-consumer/internal/catalog_notification/parser/wb_catalog_notification"
 	wbcatalognotificationRepo "core-consumer/internal/catalog_notification/repositories/wb_catalog_notification"
 	wbproduct "core-consumer/internal/catalog_notification/repositories/wb_product"
+	wbproductprice "core-consumer/internal/catalog_notification/repositories/wb_product_price"
 	"core-consumer/internal/stealth/repository/proxy"
 	useragent "core-consumer/internal/stealth/repository/user_agent"
 	"core-consumer/internal/telegram_bot/manager/bot"
@@ -31,6 +32,7 @@ type Handler struct {
 	userAgentRepo             *useragent.Repository
 	productsRepo              *wbproduct.Repository
 	tgBot                     *bot.Manager
+	pricesRepo *wbproductprice.Repository
 }
 
 func New(
@@ -42,6 +44,7 @@ func New(
 	userAgentRepo *useragent.Repository,
 	productsRepo *wbproduct.Repository,
 	tgBot *bot.Manager,
+	pricesRepo *wbproductprice.Repository,
 ) *Handler {
 	return &Handler{
 		loggerService:             loggerService,
@@ -52,6 +55,7 @@ func New(
 		userAgentRepo:             userAgentRepo,
 		productsRepo:              productsRepo,
 		tgBot:                     tgBot,
+		pricesRepo: pricesRepo,
 	}
 }
 
@@ -79,7 +83,7 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 
 	h.loggerService.Info("slep", slog.Any("sec", notification.Interval))
 
-	proxy, err := h.proxyRepo.FindByWbCatalogNotification(notification.ID)
+	proxy, err := h.proxyRepo.FindRanbom()
 	if err != nil {
 		h.loggerService.Error("proxy not found", slog.String("error", err.Error()))
 	}
@@ -134,9 +138,25 @@ func (h *Handler) Handle(ctx context.Context, job *rabbitmq.Job) error {
 		slog.Int64("proxy", proxy.ID),
 		slog.Int64("user_agent", userAgent.ID),
 	)
+	prices, err := h.pricesRepo.FindAll()
+	if err != nil {
+		return err
+	}
 
 ProductsLoop:
 	for _, product := range products {
+		if notification.UsePrices {
+			err := h.UsePrices(
+				notification,
+				&product,
+				prices,
+			)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
 		if notification.MinPrice != nil && int64(*notification.MinPrice) > product.Price {
 			continue
 		}
@@ -210,12 +230,106 @@ ProductsLoop:
 
 	time.Sleep(time.Duration(notification.Interval) * time.Second)
 
+	h.loggerService.Info(
+		"catalog_notification success",
+		slog.Int("products_count", len(products)),
+		slog.Int64("catalog_notification", notification.ID),
+		slog.Int64("proxy", proxy.ID),
+		slog.Int64("user_agent", userAgent.ID),
+	)
 	h.producer.PublishJob(ctx, &rabbitmq.Job{
 		Job: constants.JobWbCatalogNotificationProccess,
 		Data: map[string]any{
 			"id": notification.ID,
 		},
 	})
+
+	return nil
+}
+
+func (h *Handler) UsePrices(
+	notification *model.WbCatalogNotification,
+	product *wbcatalognotification.Product,
+	prices []*model.WbProductPrice,
+) error {
+ProductsLoop:
+	for _, priceInfo := range prices {
+		if priceInfo.PlusWords == nil {
+			continue
+		}
+
+		plusWords := strings.Split(strings.ToLower(*priceInfo.PlusWords), ",")
+		name := strings.ToLower(product.Name)
+
+		for _, plusWord := range plusWords {
+			if !strings.Contains(name, plusWord) {
+				continue ProductsLoop
+			}
+		}
+		stopWords := strings.Split(strings.ToLower(*priceInfo.StopWords), ",")
+
+		for _, stopWord := range stopWords {
+			if strings.Contains(name, stopWord) {
+				continue ProductsLoop
+			}
+		}
+
+		if (float64(priceInfo.MaxPrice) * 1.1) < float64(product.Price) {
+			continue
+		}
+
+		if priceInfo.MinPrice != nil && (float64(*priceInfo.MinPrice) * 1.1) > float64(product.Price) {
+			continue
+		}
+
+		h.loggerService.Info(product.Name)
+		_, err := h.productsRepo.FindByUrlAndPriceInCatalogNotification(
+			wbproduct.FindByUrlAndPriceInCatalogNotificationParams{
+				NotificationID: notification.ID,
+				URL:            product.URL,
+				Price:          int32(product.Price),
+			},
+		)
+		if err == nil {
+			h.loggerService.Info("1111111111111")
+		h.loggerService.Info(product.Name)
+			continue
+		}
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			h.loggerService.Info("22222222222222")
+		h.loggerService.Info(product.Name)
+			return err
+		}
+
+		err = h.productsRepo.Create(&model.WbCatalogNotificationProduct{
+			Price:                   int32(product.Price),
+			URL:                     product.URL,
+			Img:                     product.Img,
+			WbCatalogNotificationID: notification.ID,
+		})
+		if err != nil {
+			return err
+		}
+
+			h.loggerService.Info("33333333333333")
+		h.loggerService.Info(product.Name)
+		if err := h.tgBot.BroadcastWbCatalogNotification(
+			bot.BroadcastWbCatalogNotificationParam{
+				ImgURL:           product.Img,
+				NotificationName: notification.Name,
+				ProductURL:       product.URL,
+				Price:            product.Price,
+				Quantity:         product.Quantity,
+			},
+		); err != nil {
+			h.loggerService.Info("44444444444444")
+		h.loggerService.Info(product.Name)
+			h.loggerService.Error(
+				"Failed broadcast wb notification",
+				slog.Int64("wb_catalog_notification_id", notification.ID),
+			)
+		}
+	}
 
 	return nil
 }

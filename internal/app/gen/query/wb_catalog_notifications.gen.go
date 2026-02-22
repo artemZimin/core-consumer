@@ -40,6 +40,7 @@ func newWbCatalogNotification(db *gorm.DB, opts ...gen.DOOption) wbCatalogNotifi
 	_wbCatalogNotification.PlusWords = field.NewString(tableName, "plus_words")
 	_wbCatalogNotification.Cookie = field.NewString(tableName, "cookie")
 	_wbCatalogNotification.MinPrice = field.NewInt32(tableName, "min_price")
+	_wbCatalogNotification.UsePrices = field.NewBool(tableName, "use_prices")
 
 	_wbCatalogNotification.fillFieldMap()
 
@@ -63,6 +64,7 @@ type wbCatalogNotification struct {
 	PlusWords field.String
 	Cookie    field.String
 	MinPrice  field.Int32
+	UsePrices field.Bool
 
 	fieldMap map[string]field.Expr
 }
@@ -92,6 +94,7 @@ func (w *wbCatalogNotification) updateTableName(table string) *wbCatalogNotifica
 	w.PlusWords = field.NewString(table, "plus_words")
 	w.Cookie = field.NewString(table, "cookie")
 	w.MinPrice = field.NewInt32(table, "min_price")
+	w.UsePrices = field.NewBool(table, "use_prices")
 
 	w.fillFieldMap()
 
@@ -120,7 +123,7 @@ func (w *wbCatalogNotification) GetFieldByName(fieldName string) (field.OrderExp
 }
 
 func (w *wbCatalogNotification) fillFieldMap() {
-	w.fieldMap = make(map[string]field.Expr, 13)
+	w.fieldMap = make(map[string]field.Expr, 14)
 	w.fieldMap["id"] = w.ID
 	w.fieldMap["name"] = w.Name
 	w.fieldMap["url"] = w.URL
@@ -134,6 +137,7 @@ func (w *wbCatalogNotification) fillFieldMap() {
 	w.fieldMap["plus_words"] = w.PlusWords
 	w.fieldMap["cookie"] = w.Cookie
 	w.fieldMap["min_price"] = w.MinPrice
+	w.fieldMap["use_prices"] = w.UsePrices
 }
 
 func (w wbCatalogNotification) clone(db *gorm.DB) wbCatalogNotification {
