@@ -266,7 +266,10 @@ ProductsLoop:
 				continue ProductsLoop
 			}
 		}
-		stopWords := strings.Split(strings.ToLower(*priceInfo.StopWords), ",")
+		stopWords := make([]string, 0)
+		if stopWords != nil {
+			stopWords = strings.Split(strings.ToLower(*priceInfo.StopWords), ",")
+		}
 
 		for _, stopWord := range stopWords {
 			if strings.Contains(name, stopWord) {
@@ -282,7 +285,6 @@ ProductsLoop:
 			continue
 		}
 
-		h.loggerService.Info(product.Name)
 		_, err := h.productsRepo.FindByUrlAndPriceInCatalogNotification(
 			wbproduct.FindByUrlAndPriceInCatalogNotificationParams{
 				NotificationID: notification.ID,
@@ -291,13 +293,9 @@ ProductsLoop:
 			},
 		)
 		if err == nil {
-			h.loggerService.Info("1111111111111")
-		h.loggerService.Info(product.Name)
 			continue
 		}
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			h.loggerService.Info("22222222222222")
-		h.loggerService.Info(product.Name)
 			return err
 		}
 
@@ -311,7 +309,6 @@ ProductsLoop:
 			return err
 		}
 
-			h.loggerService.Info("33333333333333")
 		h.loggerService.Info(product.Name)
 		if err := h.tgBot.BroadcastWbCatalogNotification(
 			bot.BroadcastWbCatalogNotificationParam{
@@ -322,8 +319,6 @@ ProductsLoop:
 				Quantity:         product.Quantity,
 			},
 		); err != nil {
-			h.loggerService.Info("44444444444444")
-		h.loggerService.Info(product.Name)
 			h.loggerService.Error(
 				"Failed broadcast wb notification",
 				slog.Int64("wb_catalog_notification_id", notification.ID),
